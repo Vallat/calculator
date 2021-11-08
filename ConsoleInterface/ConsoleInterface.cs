@@ -9,8 +9,6 @@ namespace ConsoleInterface
 		{
 			Console.WriteLine("Enter 2 numbers. Available operations: +, -, *, /");
 			string? input = Console.ReadLine();
-			if(input is null)
-				return;
 			try
 			{
 				Calculator calculator = new Calculator(input);
@@ -18,7 +16,9 @@ namespace ConsoleInterface
 			}
 			catch(Exception e)
 			{
-				Console.WriteLine($"Error: {e.Message}, InnerException: {e.TargetSite}, StackTrace: {e.StackTrace}, Called method: {e.TargetSite}");
+				//This is for debug
+				//Console.WriteLine($"Error: {e.Message}, InnerException: {e.TargetSite}, StackTrace: {e.StackTrace}, Called method: {e.TargetSite}");
+				Console.WriteLine($"Error: {e.Message}");
 			}
 		}
 	}

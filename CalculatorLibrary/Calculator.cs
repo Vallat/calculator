@@ -4,7 +4,8 @@ public class Calculator
 {
 	private InputHandler handler { get; set; }
 	
-	public Calculator(string input_string)
+	//Init and check if InputHandler did everything fine
+	public Calculator(string? input_string)
 	{
 		handler = new InputHandler(input_string);
 
@@ -20,6 +21,7 @@ public class Calculator
 
 	}
 
+	//Call after initializing "Calculator" to do calculations and get the result
 	public decimal do_calculation()
 	{
 		if (handler is null)
@@ -27,6 +29,7 @@ public class Calculator
 			throw new Exception("Calculations called before initializing");
 		}
 
+		//First we find and do multiplications and divisions
 		int iterator = 0;
 		List<char> passed_operators = new List<char>();
 		foreach (char _operator in handler.foundOperators)
@@ -41,16 +44,19 @@ public class Calculator
 				iterator++;
 				continue;
 			}
+			//We remove numbers that we won't use in the future so they don't bother us
 			handler.foundNumbers.RemoveAt(iterator);
 			handler.foundNumbers[iterator] = result;
 			passed_operators.Add(_operator);
 		}
 
+		//We don't need multiplication and division operators anymore so lets remove them from the process queue
 		foreach(char _operator in passed_operators)
 		{
 			handler.foundOperators.Remove(_operator);
 		}
 
+		//Now we do the rest - sums and differences
 		iterator = 0;
 		foreach (char _operator in handler.foundOperators)
 		{
@@ -64,11 +70,13 @@ public class Calculator
 				iterator++;
 				continue;
 			}
-			iterator++;
+			//Here we remove nubmers that we calculated too, we don't need to store them
+			handler.foundNumbers.RemoveAt(iterator);
 			handler.foundNumbers[iterator] = result;
 		}
 
-		return handler.foundNumbers[handler.foundNumbers.Count - 1];
+		//Return the one element that remains - the result of our calculations
+		return handler.foundNumbers[0];
 	}
 
 	public decimal do_sum(decimal first_num, decimal second_num)
