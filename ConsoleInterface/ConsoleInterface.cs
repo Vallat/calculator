@@ -7,23 +7,19 @@ namespace ConsoleInterface
 	{
 		static void Main()
 		{
-			Calculator calculator = new Calculator();
 			Console.WriteLine("Enter 2 numbers. Available operations: +, -, *, /");
 			string? input = Console.ReadLine();
 			if(input is null)
 				return;
-			input = input.Replace(".", ",");
-			string[] strings = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-			decimal result = strings[1][0] switch 
+			try
 			{
-				'+' => calculator.do_sum(Convert.ToDecimal(strings[0]), Convert.ToDecimal(strings[2])),
-				'-' => calculator.do_sum(Convert.ToDecimal(strings[0]), -Convert.ToDecimal(strings[2])),
-				'*' => calculator.do_multiplication(Convert.ToDecimal(strings[0]), Convert.ToDecimal(strings[2])),
-				'/' => calculator.do_division(Convert.ToDecimal(strings[0]), Convert.ToDecimal(strings[2])),
-				_ => 0
-			};
-			Console.WriteLine($"{strings[0]} {strings[1]} {strings[2]} = {result}");
+				Calculator calculator = new Calculator(input);
+				Console.WriteLine($"Result: {calculator.do_calculation()}");
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine($"Error: {e.Message}, InnerException: {e.TargetSite}, StackTrace: {e.StackTrace}, Called method: {e.TargetSite}");
+			}
 		}
 	}
 }
