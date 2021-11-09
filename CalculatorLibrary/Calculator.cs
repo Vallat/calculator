@@ -3,7 +3,7 @@
 public class Calculator
 {
 	private InputHandler handler { get; set; }
-	
+
 	//Init and check if InputHandler did everything fine
 	public Calculator(string? input_string)
 	{
@@ -26,53 +26,86 @@ public class Calculator
 	{
 		if (handler is null)
 		{
-			throw new Exception("Calculations called before initializing");
+			throw new Exception("Calculations were called before calculator was initialized");
 		}
 
-		//First we find and do multiplications and divisions
-		int iterator = 0;
-		List<char> passed_operators = new List<char>();
-		foreach (char _operator in handler.foundOperators)
+		while (handler.operatorsPriority.Count > 0)
 		{
-			decimal result = 0;
-			if(_operator == '*')
-				result = do_multiplication(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
-			else if(_operator == '/') 
-				result = do_division(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
-			else
+			//First we find and do multiplications and divisions
+			int iterator = 0;
+			List<int> passed_operators_indexes = new List<int>();
+			foreach (char _operator in handler.foundOperators)
 			{
-				iterator++;
-				continue;
+				if(handler.operatorsPriority[iterator] != handler.highest_operators_priority)
+				{
+					iterator++;
+					continue;
+				}
+				decimal result = 0;
+				if (_operator == '*')
+					result = do_multiplication(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
+				else if (_operator == '/')
+					result = do_division(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
+				else
+				{
+					iterator++;
+					continue;
+				}
+				//We remove numbers that we won't use in the future so they don't bother us
+				handler.foundNumbers.RemoveAt(iterator);
+				handler.foundNumbers[iterator] = result;
+				handler.operatorsPriority.RemoveAt(iterator);
+				if(handler.operatorsPriority.Count == 0)
+					break;
+				passed_operators_indexes.Add(iterator);
 			}
-			//We remove numbers that we won't use in the future so they don't bother us
-			handler.foundNumbers.RemoveAt(iterator);
-			handler.foundNumbers[iterator] = result;
-			passed_operators.Add(_operator);
-		}
 
-		//We don't need multiplication and division operators anymore so lets remove them from the process queue
-		foreach(char _operator in passed_operators)
-		{
-			handler.foundOperators.Remove(_operator);
-		}
+			if(handler.operatorsPriority.Count == 0)
+				break;
 
-		//Now we do the rest - sums and differences
-		iterator = 0;
-		foreach (char _operator in handler.foundOperators)
-		{
-			decimal result = 0;
-			if(_operator == '+')
-				result = do_sum(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
-			else if(_operator == '-')
-				result = do_sum(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
-			else
+			void remove_opartors_indexes()
 			{
-				iterator++;
-				continue;
+				if(passed_operators_indexes.Count > 0)
+				{
+					foreach(int index in passed_operators_indexes)
+					{
+						handler.foundOperators.RemoveAt(index);
+					}
+				}
 			}
-			//Here we remove nubmers that we calculated too, we don't need to store them
-			handler.foundNumbers.RemoveAt(iterator);
-			handler.foundNumbers[iterator] = result;
+			remove_opartors_indexes();
+				
+			//Now we do the rest - sums and differences
+			iterator = 0;
+			passed_operators_indexes.Clear();
+			foreach (char _operator in handler.foundOperators)
+			{
+				if(handler.operatorsPriority[iterator] != handler.highest_operators_priority)
+				{
+					iterator++;
+					continue;
+				}
+				decimal result = 0;
+				if (_operator == '+')
+					result = do_sum(handler.foundNumbers[iterator], handler.foundNumbers[iterator + 1]);
+				else if (_operator == '-')
+					result = do_sum(handler.foundNumbers[iterator], -handler.foundNumbers[iterator + 1]);
+				else
+				{
+					iterator++;
+					continue;
+				}
+				//Here we remove nubmers that we calculated too, we don't need to store them
+				handler.foundNumbers.RemoveAt(iterator);
+				handler.foundNumbers[iterator] = result;
+				handler.operatorsPriority.RemoveAt(iterator);
+				if(handler.operatorsPriority.Count == 0)
+					break;
+				passed_operators_indexes.Add(iterator);
+			}
+			remove_opartors_indexes();
+
+			handler.highest_operators_priority--;
 		}
 
 		//Return the one element that remains - the result of our calculations
