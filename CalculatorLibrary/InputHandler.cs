@@ -5,7 +5,7 @@ internal class InputHandler
 	public List<decimal> foundNumbers { get; set; }
 	public List<char> foundOperators { get; set; }
 	public List<int> operatorsPriority { get; set; }
-	static private char[] _availableOperators { get; } = { '+', '-', '*', '/' };
+	static private char[] _availableOperators { get; } = { '+', '-', '*', '/', '^' };
 	public int highest_operators_priority = Int32.MinValue;
 
 	public InputHandler(string? stringToProcess)
@@ -72,7 +72,7 @@ internal class InputHandler
 					add_decimal(Convert.ToDecimal(curDecimal));
 					curDecimal = string.Empty;
 					add_operator(S);
-					operatorsPriority.Add(current_priority);
+					add_priority(current_priority);
 				}
 
 				else throw new Exception("Two operators in a row");
@@ -102,6 +102,11 @@ internal class InputHandler
 			foundNumbers.Insert(0, _deicmal);
 		else
 			foundNumbers.Add(_deicmal);
+	}
+
+	private void add_priority(int _priority)
+	{
+		operatorsPriority.Add(_priority);
 	}
 
 }

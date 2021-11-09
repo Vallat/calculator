@@ -7,7 +7,7 @@ namespace ConsoleInterface
 	{
 		static void Main()
 		{
-			Console.WriteLine("Enter 2 numbers. Available operations: +, -, *, /, ( and )");
+			Console.WriteLine("Enter 2 numbers. Available operations: +, -, *, /, ^, ( and )");
 			string? input = Console.ReadLine();
 			try
 			{

@@ -29,6 +29,8 @@ public class Calculator
 			throw new Exception("Calculations were called before calculator was initialized");
 		}
 
+		handle_numbers_power();
+
 		while (handler.operatorsPriority.Count > 0)
 		{
 			//First we find and do multiplications and divisions
@@ -112,6 +114,23 @@ public class Calculator
 		return handler.foundNumbers[0];
 	}
 
+	private void handle_numbers_power()
+	{
+		int curr_index = handler.foundOperators.IndexOf('^');
+		if(curr_index == -1)
+			return;
+
+		do
+		{
+			handler.foundNumbers[curr_index] = do_pow(handler.foundNumbers[curr_index], handler.foundNumbers[curr_index+1]);
+			handler.foundNumbers.RemoveAt(curr_index+1);
+			handler.foundOperators.RemoveAt(curr_index);
+			handler.operatorsPriority.RemoveAt(curr_index);
+			curr_index = handler.foundOperators.IndexOf('^');
+		}
+		while(curr_index != -1);
+	}
+
 	public decimal do_sum(decimal first_num, decimal second_num)
 	{
 		return first_num + second_num;
@@ -126,4 +145,19 @@ public class Calculator
 	{
 		return first_num / second_num;
 	}
+
+	public decimal do_pow(decimal number, decimal power)
+	{
+		int iPower = (int)power;
+		decimal remainder = power - iPower;
+		decimal new_result = number;
+		for(int itr = 1; itr < iPower; itr++)
+		{
+			new_result = do_multiplication(new_result, number);
+		}
+		if(remainder != 0)
+			new_result *= (decimal)Math.Pow((double)number, (double)(1/remainder));
+		return new_result;
+	}
+
 }
